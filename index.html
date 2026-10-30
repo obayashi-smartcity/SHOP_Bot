@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>みんまちSHOP 規約アシスタント｜いなぼ</title>
+<link rel="icon" type="image/png" href="img/inabo-face.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== デザイントークン（とうじょうRMO のトーン：生成り × 深緑 × 稲穂の金） ===== */
+  :root {
+    --bg: #f6f3ea;            /* 生成り */
+    --surface: #fffdf8;
+    --ink: #1e2a24;           /* 墨 */
+    --muted: #6f7a72;
+    --line: #e4dfd2;
+    --green: #1f3a2e;         /* 深緑 */
+    --green-2: #2d5443;
+    --green-soft: #e9efe9;
+    --gold: #c9a24b;          /* 稲穂の金 */
+    --gold-soft: #f4ecd6;
+    --danger: #a3372d;
+    --danger-soft: #f8ebe7;
+    --serif: "Shippori Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif;
+    --sans: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, system-ui, sans-serif;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--sans); color: var(--ink); background: var(--bg); font-size: 15px; line-height: 1.8; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 860px; margin: 0 auto; }
+
+  /* ===== ヘッダー ===== */
+  header { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: rgba(246,243,234,.92); backdrop-filter: blur(6px); }
+  .brand-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); overflow: hidden; flex-shrink: 0; }
+  .brand-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .brand { flex: 1; min-width: 0; line-height: 1.35; }
+  .eyebrow { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+  .brand h1 { font-family: var(--serif); font-size: 17px; font-weight: 700; margin: 2px 0 0; letter-spacing: .06em; }
+  .btn-line { border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; padding: 6px 16px; font-size: 12.5px; cursor: pointer; transition: .2s; white-space: nowrap; }
+  .btn-line:hover { background: var(--green); color: #fff; }
+
+  /* ===== チャット領域 ===== */
+  #chat { flex: 1; overflow-y: auto; padding: 8px 20px 16px; scroll-behavior: smooth; }
+
+  /* ようこそ画面 */
+  .hero { display: grid; grid-template-columns: 1fr 210px; align-items: center; gap: 12px; padding: 36px 0 20px; }
+  .hero .eyebrow { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .hero .eyebrow::after { content: ""; width: 40px; height: 1px; background: var(--gold); }
+  .hero h2 { font-family: var(--serif); font-size: 30px; line-height: 1.55; font-weight: 700; margin: 0 0 14px; letter-spacing: .06em; }
+  .hero h2 em { font-style: normal; color: var(--green); background: linear-gradient(transparent 68%, var(--gold-soft) 68%); }
+  .hero p { margin: 0; color: var(--muted); font-size: 14px; }
+  .hero-chara { position: relative; justify-self: center; }
+  .hero-chara img { width: 190px; height: auto; display: block; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 14px 18px rgba(31,58,46,.14)); }
+  .hero-chara .speech {
+    position: absolute; top: 4px; left: -86px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 6px 12px; font-size: 12.5px; white-space: nowrap; color: var(--green); font-weight: 500;
+  }
+  .hero-chara .speech::after { content: ""; position: absolute; right: -6px; top: 50%; width: 10px; height: 10px; background: var(--surface); border-right: 1px solid var(--line); border-top: 1px solid var(--line); transform: translateY(-50%) rotate(45deg); }
+  .hero-chara.is-fallback .speech { left: -112px; }
+  .hero-chara img.fallback { width: 120px; border-radius: 28px; border: 1px solid var(--line); }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .examples { border-top: 1px solid var(--line); margin-top: 8px; }
+  .examples-label { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin: 16px 0 4px; }
+  .chip {
+    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; text-align: left;
+    background: none; border: none; border-bottom: 1px solid var(--line); padding: 14px 4px; font-size: 14.5px; color: var(--ink); cursor: pointer; transition: .2s;
+  }
+  .chip::after { content: "→"; color: var(--gold); transition: transform .2s; }
+  .chip:hover { color: var(--green); padding-left: 10px; }
+  .chip:hover::after { transform: translateX(4px); }
+  .chip:disabled { opacity: .45; cursor: default; }
+
+  /* メッセージ */
+  .msg { display: flex; gap: 10px; margin: 18px 0; align-items: flex-start; }
+  .msg.user { justify-content: flex-end; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--surface); border: 1px solid var(--line); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar.thinking img { animation: think 1.4s ease-in-out infinite; transform-origin: 50% 80%; }
+  @keyframes think { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) translateY(-1px); } }
+  .bot-col { flex: 1; min-width: 0; }
+  .name { font-size: 11.5px; color: var(--muted); margin: 2px 0 4px; letter-spacing: .08em; }
+  .bubble { border-radius: var(--radius); padding: 12px 16px; word-wrap: break-word; overflow-wrap: anywhere; }
+  .user .bubble { background: var(--green); color: #fff; border-top-right-radius: 4px; max-width: 80%; white-space: pre-wrap; }
+  .bot .bubble { background: var(--surface); border: 1px solid var(--line); border-top-left-radius: 4px; }
+  .bot.error .bubble { background: var(--danger-soft); border-color: #ecd0c8; color: var(--danger); }
+
+  /* 回答本文（Markdown の簡易表示） */
+  .md p { margin: 0 0 10px; }
+  .md p:last-child { margin-bottom: 0; }
+  .md .h { font-family: var(--serif); font-weight: 700; color: var(--green); }
+  .md strong { color: var(--green); background: linear-gradient(transparent 70%, var(--gold-soft) 70%); }
+  .md ul, .md ol { margin: 0 0 10px; padding-left: 1.4em; }
+  .md li { margin: 3px 0; }
+  .md li::marker { color: var(--gold); }
+  .md code { background: var(--green-soft); border-radius: 4px; padding: 0 5px; font-size: .9em; }
+  .md blockquote { margin: 0 0 10px; padding: 2px 12px; border-left: 2px solid var(--gold); color: var(--muted); }
+  .table-wrap { overflow-x: auto; margin: 4px 0 12px; }
+  .md table { border-collapse: collapse; font-size: 13.5px; min-width: 60%; }
+  .md th, .md td { border-bottom: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; }
+  .md th { color: var(--green); font-weight: 700; border-bottom: 1.5px solid var(--green); white-space: nowrap; }
+
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+  .meta .spacer { flex: 1; }
+  .meta button { border: none; background: none; color: var(--muted); cursor: pointer; font-size: 11.5px; padding: 2px 6px; border-radius: 6px; }
+  .meta button:hover { color: var(--green); background: var(--green-soft); }
+  .notice { font-size: 12px; color: #7a5a14; background: var(--gold-soft); border-radius: 8px; padding: 4px 10px; margin-top: 10px; }
+
+  /* 参照元 */
+  details.sources { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+  details.sources summary { cursor: pointer; font-size: 12.5px; color: var(--green); list-style: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  details.sources summary::-webkit-details-marker { display: none; }
+  .src-label { font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-right: 4px; }
+  .src-label::before { content: "＋ "; }
+  details.sources[open] .src-label::before { content: "－ "; }
+  .doc-tag { border: 1px solid var(--line); border-radius: 999px; padding: 0 10px; font-size: 12px; background: var(--bg); }
+  .src { margin-top: 12px; }
+  .src-title { font-family: var(--serif); font-weight: 700; font-size: 13.5px; color: var(--green); }
+  .src-title a { color: var(--gold); margin-left: 8px; font-family: var(--sans); font-weight: 500; font-size: 12px; }
+  .excerpt { margin: 6px 0 0; padding: 8px 12px; background: var(--bg); border-left: 2px solid var(--gold); border-radius: 0 8px 8px 0; font-size: 12.5px; color: #4a554e; white-space: pre-wrap; max-height: 7.4em; overflow: hidden; }
+  .excerpt.expanded { max-height: none; }
+  .more { border: none; background: none; color: var(--gold); font-size: 12px; cursor: pointer; padding: 2px 0; }
+  .no-src { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  /* 待機中 */
+  .typing { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13.5px; }
+  .dots { display: inline-flex; gap: 5px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: blink 1.2s infinite ease-in-out; }
+  .dots i:nth-child(2) { animation-delay: .2s; }
+  .dots i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .2; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+  .retry { margin-top: 10px; border: 1px solid var(--danger); background: transparent; color: var(--danger); border-radius: 999px; padding: 4px 14px; cursor: pointer; font-size: 12.5px; }
+  .retry:hover { background: var(--danger); color: #fff; }
+
+  /* ===== 入力欄 ===== */
+  .composer-wrap { padding: 10px 20px 12px; border-top: 1px solid var(--line); background: rgba(246,243,234,.95); }
+  form#composer { display: flex; gap: 8px; align-items: flex-end; background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 6px 6px 6px 18px; transition: .2s; }
+  form#composer:focus-within { border-color: var(--green); box-shadow: 0 0 0 4px rgba(31,58,46,.08); }
+  textarea#input { flex: 1; resize: none; border: none; outline: none; background: transparent; font: inherit; line-height: 1.6; padding: 8px 0; max-height: 160px; min-height: 40px; color: var(--ink); }
+  textarea#input::placeholder { color: #a3a99f; }
+  button#send { width: 42px; height: 42px; flex-shrink: 0; border: none; border-radius: 50%; background: var(--green); color: #fff; cursor: pointer; display: grid; place-items: center; transition: .2s; }
+  button#send:hover:not(:disabled) { background: var(--green-2); transform: translateY(-1px); }
+  button#send:disabled { background: #b9c3bc; cursor: default; }
+  button#send svg { width: 18px; height: 18px; }
+  .composer-foot { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--muted); padding: 0 6px; }
+  #counter.over { color: var(--danger); font-weight: 700; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  @media (max-width: 600px) {
+    header { padding: 12px 14px; }
+    #chat { padding: 4px 14px 12px; }
+    .hero { grid-template-columns: 1fr; padding: 22px 0 10px; text-align: left; }
+    .hero-chara { order: -1; justify-self: start; display: flex; align-items: center; gap: 12px; }
+    .hero-chara img { width: 96px; order: -1; }
+    .hero-chara { padding-left: 6px; }
+    .brand h1 { font-size: 15px; }
+    .hero-chara .speech { position: static; }
+    .hero-chara .speech::after { left: -6px; right: auto; transform: translateY(-50%) rotate(-135deg); }
+    .hero h2 { font-size: 23px; }
+    .user .bubble { max-width: 88%; }
+    .composer-wrap { padding: 8px 12px 10px; }
+    .composer-foot .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand-icon"><img class="chara-img" data-kind="face" src="img/inabo-face.png" alt=""></div>
+    <div class="brand">
+      <div class="eyebrow">Terms Assistant</div>
+      <h1>みんまちSHOP 規約アシスタント</h1>
+    </div>
+    <button type="button" class="btn-line" id="clear">新しい会話</button>
+  </header>
+
+  <main id="chat" aria-live="polite"></main>
+
+  <div class="composer-wrap">
+    <form id="composer" autocomplete="off">
+      <label for="input" class="sr-only">質問</label>
+      <textarea id="input" rows="1" maxlength="1200" placeholder="いなぼに質問する"></textarea>
+      <button type="submit" id="send" aria-label="送信">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <div class="composer-foot">
+      <span>回答は AI が規約類をもとに作成します。正式な判断は規約の原文、または事務局（m-shop@machiapps.com）にご確認ください。</span>
+      <span><span class="hint">Enter で送信 / Shift+Enter で改行　</span><span id="counter"></span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== 設定 =====
+  // 1) GAS の HtmlService で配信する場合：そのままで OK（google.script.run を使います）
+  // 2) この HTML を別のサーバーで公開する場合：GAS ウェブアプリの URL（/exec）を入れてください
+  var GAS_ENDPOINT = '';
+  var IMG_BASE = 'img/';           // キャラクター画像の置き場所
+  var CHARA_NAME = 'いなぼ';
+  var MAX_CHARS = 1000;            // サーバー側の上限と合わせる
+  var MAX_HISTORY_TURNS = 6;       // サーバーに送る会話の往復数
+  var EXAMPLES = [
+    'お弁当を配達委託した場合の手数料はいくらですか？',
+    '予約はいつまでキャンセルできますか？',
+    '出店者と共同利用される個人情報の項目は？',
+    '出店契約を解約するにはどうすればよいですか？'
+  ];
+
+  var state = { history: [], busy: false };
+  var els = {};
+  var HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+
+  // ===== キャラクター画像（読み込めない環境では SVG の簡易アイコンに切り替える）=====
+  var FALLBACK_FACE = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#fffdf8"/>' +
+    '<path d="M32 15 C33 9 37 6 42 5" stroke="#c9a24b" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="43" cy="5.5" r="3" fill="#c9a24b"/><rect x="11" y="15" width="42" height="34" rx="15" fill="#f1ecdd"/>' +
+    '<rect x="16" y="20" width="32" height="24" rx="10" fill="#1f3a2e"/><ellipse cx="26" cy="30" rx="3" ry="4" fill="#f2d68a"/>' +
+    '<ellipse cx="38" cy="30" rx="3" ry="4" fill="#f2d68a"/><path d="M28 37 Q32 40 36 37" stroke="#f2d68a" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+    '<rect x="7" y="26" width="5" height="12" rx="2.5" fill="#1f3a2e"/><rect x="52" y="26" width="5" height="12" rx="2.5" fill="#1f3a2e"/></svg>');
+  function charaSrc(kind) { return IMG_BASE + (kind === 'full' ? 'inabo.png' : 'inabo-face.png'); }
+  function bindCharaFallback(img) {
+    img.addEventListener('error', function onErr() {
+      img.removeEventListener('error', onErr);
+      img.src = FALLBACK_FACE;
+      if (img.dataset.kind === 'full') {
+        img.classList.add('fallback');
+        if (img.parentElement) img.parentElement.classList.add('is-fallback');
+      }
+    });
+  }
+  function charaImg(kind, alt) {
+    var img = document.createElement('img');
+    img.className = 'chara-img';
+    img.dataset.kind = kind;
+    img.alt = alt || '';
+    bindCharaFallback(img);
+    img.src = charaSrc(kind);
+    return img;
+  }
+
+  // ===== 安全な表示（HTML エスケープ + 簡易 Markdown）=====
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function inlineMd(escaped) {
+    return escaped
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  }
+  function isTableSep(line) {
+    return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$/.test(line);
+  }
+  function tableCells(line) {
+    return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (c) { return inlineMd(esc(c.trim())); });
+  }
+  var RE_UL = /^\s*(?:[-*]\s+|・\s*)(.*)$/;
+  var RE_OL = /^\s*(\d+)[.)．]\s+(.*)$/;
+  var RE_H = /^\s*#{1,6}\s+(.*)$/;
+  var RE_QUOTE = /^\s*>\s?(.*)$/;
+  function startsBlock(lines, i) {
+    var l = lines[i];
+    return RE_UL.test(l) || RE_OL.test(l) || RE_H.test(l) || RE_QUOTE.test(l) ||
+      (l.indexOf('|') >= 0 && i + 1 < lines.length && isTableSep(lines[i + 1]));
+  }
+  function renderMarkdown(md) {
+    var lines = String(md == null ? '' : md).replace(/\r\n?/g, '\n').split('\n');
+    var html = '', i = 0, m, items;
+    while (i < lines.length) {
+      var l = lines[i];
+      if (!l.trim()) { i++; continue; }
+      if (l.indexOf('|') >= 0 && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+        var head = tableCells(l); i += 2;
+        var rows = [];
+        while (i < lines.length && lines[i].trim() && lines[i].indexOf('|') >= 0) { rows.push(tableCells(lines[i])); i++; }
+        html += '<div class="table-wrap"><table><thead><tr>' +
+          head.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
+          rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
+          '</tbody></table></div>';
+        continue;
+      }
+      if ((m = l.match(RE_H))) { html += '<p class="h">' + inlineMd(esc(m[1])) + '</p>'; i++; continue; }
+      if (RE_UL.test(l)) {
+        items = [];
+        while (i < lines.length && (m = lines[i].match(RE_UL))) { items.push('<li>' + inlineMd(esc(m[1])) + '</li>'); i++; }
+        html += '<ul>' + items.join('') + '</ul>'; continue;
+      }
+      if ((m = l.match(RE_OL))) {
+        var start = parseInt(m[1], 10) || 1;
+        items = [];
+        while (i < lines.length && (m = lines[i].match(RE_OL))) { items.push('<li>' + inlineMd(esc(m[2])) + '</li>'); i++; }
+        html += '<ol' + (start !== 1 ? ' start="' + start + '"' : '') + '>' + items.join('') + '</ol>'; continue;
+      }
+      if (RE_QUOTE.test(l)) {
+        items = [];
+        while (i < lines.length && (m = lines[i].match(RE_QUOTE))) { items.push(inlineMd(esc(m[1]))); i++; }
+        html += '<blockquote>' + items.join('<br>') + '</blockquote>'; continue;
+      }
+      var buf = [inlineMd(esc(l.trim()))]; i++;
+      while (i < lines.length && lines[i].trim() && !startsBlock(lines, i)) { buf.push(inlineMd(esc(lines[i].trim()))); i++; }
+      html += '<p>' + buf.join('<br>') + '</p>';
+    }
+    return html;
+  }
+  function safeHttpsUrl(u) {
+    return (typeof u === 'string' && /^https:\/\/[^\s"'<>]+$/.test(u)) ? u : '';
+  }
+
+  // ===== DOM 部品 =====
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function scrollToBottom() { els.chat.scrollTop = els.chat.scrollHeight; }
+
+  function renderWelcome() {
+    var wrap = el('section', 'welcome');
+    wrap.id = 'welcome';
+    var hero = el('div', 'hero');
+    var text = el('div');
+    text.appendChild(el('div', 'eyebrow', 'Ask ' + 'Inabo'));
+    var h2 = el('h2');
+    h2.appendChild(document.createTextNode('規約のこと、'));
+    h2.appendChild(document.createElement('br'));
+    var em = el('em', null, CHARA_NAME);
+    h2.appendChild(em);
+    h2.appendChild(document.createTextNode('に聞いてください。'));
+    text.appendChild(h2);
+    text.appendChild(el('p', null, '利用規約・出店規約・プライバシーポリシーをもとに、根拠となる条文（参照元）といっしょにお答えします。'));
+    var chara = el('div', 'hero-chara');
+    chara.appendChild(el('div', 'speech', 'こんにちは！'));
+    chara.appendChild(charaImg('full', CHARA_NAME));
+    hero.appendChild(text); hero.appendChild(chara);
+    wrap.appendChild(hero);
+
+    var ex = el('div', 'examples');
+    ex.appendChild(el('div', 'examples-label', 'Examples'));
+    EXAMPLES.forEach(function (q) {
+      var c = el('button', 'chip', q);
+      c.type = 'button';
+      c.addEventListener('click', function () { send(q); });
+      ex.appendChild(c);
+    });
+    wrap.appendChild(ex);
+    els.chat.appendChild(wrap);
+  }
+
+  function botRow(extraCls) {
+    var row = el('div', 'msg bot' + (extraCls ? ' ' + extraCls : ''));
+    var av = el('div', 'avatar');
+    av.appendChild(charaImg('face', ''));
+    var col = el('div', 'bot-col');
+    col.appendChild(el('div', 'name', CHARA_NAME));
+    var b = el('div', 'bubble');
+    col.appendChild(b);
+    row.appendChild(av); row.appendChild(col);
+    return { row: row, bubble: b, avatar: av };
+  }
+  function addUserMessage(text) {
+    var row = el('div', 'msg user');
+    row.appendChild(el('div', 'bubble', text));
+    els.chat.appendChild(row);
+    scrollToBottom();
+  }
+  function addTyping() {
+    var r = botRow();
+    r.avatar.classList.add('thinking');
+    var t = el('div', 'typing');
+    var dots = el('span', 'dots');
+    dots.innerHTML = '<i></i><i></i><i></i>';
+    var label = el('span', null, '資料を探しています…');
+    t.appendChild(dots); t.appendChild(label); r.bubble.appendChild(t);
+    els.chat.appendChild(r.row);
+    scrollToBottom();
+    var sec = 0;
+    var timer = setInterval(function () {
+      sec++;
+      if (sec === 4) label.textContent = '回答をまとめています…';
+      if (sec >= 15) label.textContent = '混み合っているみたいです。もう少しお待ちください…（' + sec + '秒）';
+    }, 1000);
+    return { remove: function () { clearInterval(timer); r.row.remove(); } };
+  }
+  function copyText(text, btn) {
+    function done() { var o = btn.textContent; btn.textContent = 'コピーしました'; setTimeout(function () { btn.textContent = o; }, 1500); }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { /* 何もしない */ }
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  }
+  function renderSources(container, sources) {
+    if (!sources || !sources.length) {
+      container.appendChild(el('div', 'no-src', '※ この回答では、資料からの引用はありませんでした。'));
+      return;
+    }
+    var det = el('details', 'sources');
+    var sum = el('summary');
+    sum.appendChild(el('span', 'src-label', 'Sources'));
+    sources.forEach(function (s) { sum.appendChild(el('span', 'doc-tag', s.doc)); });
+    det.appendChild(sum);
+    sources.forEach(function (s) {
+      var box = el('div', 'src');
+      var title = el('div', 'src-title', s.doc);
+      var url = safeHttpsUrl(s.url);
+      if (url) {
+        var a = el('a', null, '原文を開く →');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        title.appendChild(a);
+      }
+      box.appendChild(title);
+      (s.excerpts || []).forEach(function (x) {
+        var q = el('blockquote', 'excerpt', x);
+        box.appendChild(q);
+        if (x.length > 120) {
+          var more = el('button', 'more', '続きを表示');
+          more.type = 'button';
+          more.addEventListener('click', function () {
+            var open = q.classList.toggle('expanded');
+            more.textContent = open ? '折りたたむ' : '続きを表示';
+          });
+          box.appendChild(more);
+        }
+      });
+      det.appendChild(box);
+    });
+    container.appendChild(det);
+  }
+  function addBotAnswer(res) {
+    var r = botRow();
+    var body = el('div', 'md');
+    body.innerHTML = renderMarkdown(res.answer);   // renderMarkdown は全文字列をエスケープ済み
+    r.bubble.appendChild(body);
+    if (res.truncated) r.bubble.appendChild(el('div', 'notice', '※ 回答が長いため、途中で終わっている可能性があります。質問を分けてお試しください。'));
+    renderSources(r.bubble, res.sources);
+    var meta = el('div', 'meta');
+    if (res.elapsedMs) meta.appendChild(el('span', null, (res.elapsedMs / 1000).toFixed(1) + '秒'));
+    if (res.fallback && res.model) meta.appendChild(el('span', null, '混雑のため ' + res.model + ' で回答'));
+    meta.appendChild(el('span', 'spacer'));
+    var copy = el('button', null, 'コピー');
+    copy.type = 'button';
+    copy.addEventListener('click', function () { copyText(res.answer, copy); });
+    meta.appendChild(copy);
+    r.bubble.appendChild(meta);
+    els.chat.appendChild(r.row);
+    scrollToBottom();
+  }
+  function addError(message, retryQuestion) {
+    var r = botRow('error');
+    r.bubble.appendChild(el('div', null, message));
+    if (retryQuestion) {
+      var btn = el('button', 'retry', 'もう一度送信');
+      btn.type = 'button';
+      btn.addEventListener('click', function () {
+        if (state.busy) return;
+        r.row.remove();
+        send(retryQuestion, { skipUserBubble: true });
+      });
+      r.bubble.appendChild(btn);
+    }
+    els.chat.appendChild(r.row);
+    scrollToBottom();
+  }
+
+  // ===== サーバー呼び出し =====
+  function clientId() {
+    try {
+      var id = localStorage.getItem('inabo_cid');
+      if (!id) { id = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('inabo_cid', id); }
+      return id;
+    } catch (e) { return ''; }
+  }
+  function callAsk(payload) {
+    if (HAS_GAS) {
+      return new Promise(function (resolve, reject) {
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).ask(payload);
+      });
+    }
+    if (GAS_ENDPOINT) {
+      payload.clientId = clientId();
+      // text/plain にすることで、CORS の事前確認（preflight）なしで GAS に送れる
+      return fetch(GAS_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload), redirect: 'follow' })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
+    return new Promise(function (resolve) { setTimeout(function () { resolve(previewAnswer(payload)); }, 900); });
+  }
+  function previewAnswer() {
+    return {
+      ok: true, elapsedMs: 900, model: 'preview', fallback: false,
+      answer: '（プレビュー表示です。GAS と接続すると実際の回答が表示されます）\n\n' +
+        'お弁当・スイーツ等の商品を指定配達事業者に配達委託する場合、手数料等は **代金（税込）の 28％** です（出店規約 手数料一覧）。\n\n' +
+        '| 区分 | 手数料等 |\n|---|---|\n| 提供場所まで持参 | 代金（税込）の 8％ |\n| 配達を委託 | 代金（税込）の 28％ |\n\n' +
+        '- 配達手数料等を含みます\n- 指定決済代行事業者の手数料は別途です',
+      sources: [{ doc: 'みんまちSHOP 出店規約', url: '', excerpts: ['お弁当・スイーツ等の商品 | 乙が指定配達事業者に対し、本件商品等の提供場所までの配達を委託する場合（※配達手数料等を含む） | 代金（税込）の 28％'] }]
+    };
+  }
+
+  // ===== 送信 =====
+  function setBusy(b) {
+    state.busy = b;
+    els.send.disabled = b || !els.input.value.trim() || els.input.value.length > MAX_CHARS;
+    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.disabled = b; });
+  }
+  function send(question, opts) {
+    opts = opts || {};
+    var q = String(question || '').trim();
+    if (!q || state.busy) return;
+    if (q.length > MAX_CHARS) { addError('質問は ' + MAX_CHARS + ' 文字以内で入力してください。'); return; }
+    var welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+    if (!opts.skipUserBubble) addUserMessage(q);
+    setBusy(true);
+    var typing = addTyping();
+    var payload = { question: q, history: state.history.slice(-MAX_HISTORY_TURNS * 2) };
+    callAsk(payload).then(function (res) {
+      typing.remove();
+      if (res && res.ok) {
+        addBotAnswer(res);
+        state.history.push({ role: 'user', text: q }, { role: 'model', text: res.answer });
+        state.history = state.history.slice(-MAX_HISTORY_TURNS * 2);
+      } else {
+        var retryable = res && ['BUSY', 'API', 'INTERNAL', 'EMPTY'].indexOf(res.code) >= 0;
+        addError((res && res.error) || 'エラーが発生しました。', retryable ? q : null);
+      }
+    }, function (err) {
+      typing.remove();
+      console.error(err);
+      addError('通信エラーが発生しました。ネットワークを確認して、もう一度お試しください。', q);
+    }).then(function () {
+      setBusy(false);
+      els.input.focus();
+    });
+  }
+
+  // ===== 初期化 =====
+  function autoGrow() {
+    els.input.style.height = 'auto';
+    els.input.style.height = Math.min(els.input.scrollHeight, 160) + 'px';
+  }
+  function updateCounter() {
+    var n = els.input.value.length;
+    els.counter.textContent = n > MAX_CHARS * 0.8 ? n + ' / ' + MAX_CHARS : '';
+    els.counter.className = n > MAX_CHARS ? 'over' : '';
+    els.send.disabled = state.busy || !els.input.value.trim() || n > MAX_CHARS;
+  }
+  function resetChat() {
+    if (state.busy) return;
+    state.history = [];
+    els.chat.innerHTML = '';
+    renderWelcome();
+    els.input.focus();
+  }
+  function init() {
+    els.chat = document.getElementById('chat');
+    els.input = document.getElementById('input');
+    els.send = document.getElementById('send');
+    els.counter = document.getElementById('counter');
+    els.form = document.getElementById('composer');
+
+    // ヘッダーのアイコン（HTML に直接書いた img）にもフォールバックを付ける
+    Array.prototype.forEach.call(document.querySelectorAll('img.chara-img'), function (img) {
+      bindCharaFallback(img);
+      if (img.complete && img.naturalWidth === 0) img.src = FALLBACK_FACE;
+    });
+    renderWelcome();
+    updateCounter();
+    els.form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var q = els.input.value;
+      if (!q.trim() || state.busy || q.length > MAX_CHARS) return;
+      els.input.value = '';
+      autoGrow(); updateCounter();
+      send(q);
+    });
+    els.input.addEventListener('keydown', function (e) {
+      // 日本語変換の確定中（isComposing / keyCode 229）は送信しない
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+        e.preventDefault();
+        els.form.requestSubmit ? els.form.requestSubmit() : els.form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    });
+    els.input.addEventListener('input', function () { autoGrow(); updateCounter(); });
+    document.getElementById('clear').addEventListener('click', resetChat);
+    els.input.focus();
+  }
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
