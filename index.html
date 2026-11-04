@@ -446,15 +446,23 @@ details.sources[open] .src-label::before { content: "−"; }
     '<ellipse cx="120" cy="281" rx="34" ry="4" class="rb-thrust"/>' +
     // 左腕（下ろしている）
     '<g class="rb-arm-l">' +
-      '<path d="M148 184 Q166 192 168 214" class="rb-limb-o"/><path d="M148 184 Q166 192 168 214" class="rb-limb"/>' +
-      '<path d="M158 196 l8 -5" class="rb-band"/>' +
-      '<circle cx="168" cy="219" r="8.5" class="rb-shell"/>' +
+      '<path d="M152 192 Q170 198 170 216" class="rb-limb-o"/><path d="M152 192 Q170 198 170 216" class="rb-limb"/>' +
+      '<path d="M161 202 l8 -4" class="rb-band"/>' +
+      '<circle cx="170" cy="221" r="8.5" class="rb-shell"/>' +
+    '</g>' +
+    // 右手（手袋で挨拶）
+    '<g class="rb-arm-r">' +
+      '<path d="M88 192 Q62 190 44 168" class="rb-limb-o"/><path d="M88 192 Q62 190 44 168" class="rb-limb"/>' +
+      '<path d="M60 189 l5 -8" class="rb-band"/>' +
+      '<path d="M38 160 L23 151 M38 160 L26 140 M38 160 L35 134 M38 160 L46 137 M38 160 L53 156" class="rb-finger-o"/>' +
+      '<circle cx="38" cy="160" r="13" class="rb-shell"/>' +
+      '<path d="M38 160 L23 151 M38 160 L26 140 M38 160 L35 134 M38 160 L46 137 M38 160 L53 156" class="rb-finger"/>' +
     '</g>' +
     // 胴体（白＋ダークグレーのロボットスーツ）
-    '<path d="M90 168 h60 a16 16 0 0 1 16 16 v50 h-92 v-50 a16 16 0 0 1 16 -16z" class="rb-shell"/>' +
-    '<path d="M74 214 h92 v20 h-92z" class="rb-suit"/>' +
-    '<path d="M74 190 q8 -2 14 2 v22 h-14z M166 190 q-8 -2 -14 2 v22 h14z" class="rb-suit"/>' +
-    '<rect x="98" y="166" width="44" height="10" rx="5" class="rb-suit"/>' +
+    '<path d="M98 168 h44 a14 14 0 0 1 14 14 v52 h-72 v-52 a14 14 0 0 1 14 -14z" class="rb-shell"/>' +
+    '<path d="M84 214 h72 v20 h-72z" class="rb-suit"/>' +
+    '<path d="M84 190 q7 -2 12 2 v22 h-12z M156 190 q-7 -2 -12 2 v22 h12z" class="rb-suit"/>' +
+    '<rect x="101" y="166" width="38" height="10" rx="5" class="rb-suit"/>' +
     // 胸の赤い歯車
     '<g class="rb-gear">' +
       '<path d="M120.0 186.0 L122.3 186.2 L123.4 189.7 L125.0 190.5 L128.5 189.5 L130.0 191.3 L128.3 194.6 L128.8 196.2 L132.0 198.0 L131.8 200.3 L128.3 201.4 L127.5 203.0 L128.5 206.5 L126.7 208.0 L123.4 206.3 L121.8 206.8 L120.0 210.0 L117.7 209.8 L116.6 206.3 L115.0 205.5 L111.5 206.5 L110.0 204.7 L111.7 201.4 L111.2 199.8 L108.0 198.0 L108.2 195.7 L111.7 194.6 L112.5 193.0 L111.5 189.5 L113.3 188.0 L116.6 189.7 L118.2 189.2Z" class="rb-red"/>' +
@@ -467,14 +475,6 @@ details.sources[open] .src-label::before { content: "−"; }
     '<g class="rb-lights">' +
       '<ellipse cx="96" cy="261" rx="10" ry="6.5" class="rb-yellow"/><ellipse cx="144" cy="261" rx="10" ry="6.5" class="rb-yellow"/>' +
       '<ellipse cx="93" cy="259" rx="3.5" ry="2" fill="#fff" opacity=".85"/><ellipse cx="141" cy="259" rx="3.5" ry="2" fill="#fff" opacity=".85"/>' +
-    '</g>' +
-    // 右手（手袋で挨拶）
-    '<g class="rb-arm-r">' +
-      '<path d="M92 184 Q64 186 44 168" class="rb-limb-o"/><path d="M92 184 Q64 186 44 168" class="rb-limb"/>' +
-      '<path d="M64 181 l3 -9" class="rb-band"/>' +
-      '<path d="M38 160 L23 151 M38 160 L26 140 M38 160 L35 134 M38 160 L46 137 M38 160 L53 156" class="rb-finger-o"/>' +
-      '<circle cx="38" cy="160" r="13" class="rb-shell"/>' +
-      '<path d="M38 160 L23 151 M38 160 L26 140 M38 160 L35 134 M38 160 L46 137 M38 160 L53 156" class="rb-finger"/>' +
     '</g>';
   var ROBOT_HEAD =
     // ヘッドホン状の耳パーツ
